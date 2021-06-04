@@ -1,15 +1,17 @@
 from django.db import models
 
+from django.contrib.auth import get_user_model
+
 class Message(models.Model):
-	user_name = models.CharField(max_length=200)
-	pub_date = models.DateTimeField()
+	author = models.CharField(max_length=200)
+	timestamp = models.DateTimeField(auto_now_add=True)
 	content = models.TextField()
 
 	def __str__(self):
-		return self.user_name
+		return self.author.username
 
 	def __str__(self):
-		return self.pub_date
+		return self.timestamp
 
 	def __str__(self):
 		return self.content			
