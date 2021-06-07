@@ -1,6 +1,7 @@
 #from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.request import Request
+from django.views.decorators.http import last_modified
 
 #from rest_framework import generics
 from rest_framework.parsers import JSONParser
@@ -14,14 +15,22 @@ from .serializers import MessageSerializer
 #	serializer_class = MessageSerializer
 
 
-#list all messages, or create a new message
+#list all messages, or create a new message	
 
-def create_message(request):
+def latest_message(request):
+    return Message.objects.latest("timestamp").timestamp
+
+@last_modified(latest_message)
+def load_messages(request):
 	if request.method == 'GET':
 		messages = Message.objects.all()
 		serializer = MessageSerializer(messages, many=True)
-		return JsonResponse(serializer.data, safe=False)
-	elif request.method == 'POST':
+		response = JsonResponse(serializer.data, safe=False)
+		response["Access-Control-Allow-Origin"] = "*"
+		return response	
+
+def create_message(request):
+	if request.method == 'POST':
 		serializer = MessageSerializer(data=request.POST)
 		if serializer.is_valid():
 			#Message.objects.create()
