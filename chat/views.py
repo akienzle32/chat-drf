@@ -18,7 +18,7 @@ def latest_message(request):
 def create_and_load_messages(request):
 	if request.method == 'GET':
 		#messages = Message.objects.all().order_by('-id')[:1]
-		messages = Messages.objects.all()
+		messages = Message.objects.all()
 		serializer = MessageSerializer(messages, many=True)
 		response = JsonResponse(serializer.data, safe=False)
 		response["Access-Control-Allow-Origin"] = "*"
