@@ -27,6 +27,6 @@ def create_and_load_messages(request):
 		serializer = MessageSerializer(data=data)
 		if serializer.is_valid():
 			serializer.save()
-			return HttpResponse(serializer.data, status=201)
-		return HttpResponse(serializer.errors, status=400)	
+			return JsonResponse(serializer.data, status=201)
+		return JsonResponse(serializer.errors, status=400)	
 					
