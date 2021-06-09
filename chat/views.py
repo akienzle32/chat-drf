@@ -8,6 +8,7 @@ from rest_framework.parsers import JSONParser
 from .models import Message
 from django.contrib.auth.models import User
 from .serializers import MessageSerializer
+from datetime import datetime
 
 
 def latest_message(request):
@@ -22,7 +23,8 @@ def create_and_load_messages(request):
 		response["Access-Control-Allow-Origin"] = "*"
 		return response	
 	elif request.method == 'POST':
-		serializer = MessageSerializer(data=request.POST)
+		data = JSONParser().parse(request)
+		serializer = MessageSerializer(data=data)
 		if serializer.is_valid():
 			serializer.save()
 			return HttpResponse(serializer.data, status=201)
