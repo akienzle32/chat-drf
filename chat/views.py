@@ -3,7 +3,6 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.request import Request
 from django.views.decorators.http import last_modified
 
-#from rest_framework import generics
 from rest_framework.parsers import JSONParser
 
 from .models import Message
@@ -17,7 +16,6 @@ def latest_message(request):
 @last_modified(latest_message)
 def create_and_load_messages(request):
 	if request.method == 'GET':
-		#messages = Message.objects.all().order_by('-id')[:1]
 		messages = Message.objects.all()
 		serializer = MessageSerializer(messages, many=True)
 		response = JsonResponse(serializer.data, safe=False)
@@ -26,10 +24,7 @@ def create_and_load_messages(request):
 	elif request.method == 'POST':
 		serializer = MessageSerializer(data=request.POST)
 		if serializer.is_valid():
-			#Message.objects.create()
 			serializer.save()
 			return HttpResponse(serializer.data, status=201)
 		return HttpResponse(serializer.errors, status=400)	
 					
-
-#request.GET.get('param1', None)
