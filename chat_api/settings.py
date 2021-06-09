@@ -46,8 +46,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DATETIME_INPUT_FORMATS': ['%a %b %e %-I:%M%p',],
-    'DATETIME_FORMAT': '%a %b %e %-I:%M%p',
+    'DATETIME_INPUT_FORMATS': ['%a, %b %e %-I:%M%p',],
+    'DATETIME_FORMAT': '%a, %b %e %-I:%M%p',
 }
 
 MIDDLEWARE = [
