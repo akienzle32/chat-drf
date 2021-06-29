@@ -48,6 +48,10 @@ REST_FRAMEWORK = {
     ],
     'DATETIME_INPUT_FORMATS': ['%a, %b %e %-I:%M%p',],
     'DATETIME_FORMAT': '%a, %b %e %-I:%M%p',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
 
 MIDDLEWARE = [
@@ -56,7 +60,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -64,7 +68,9 @@ MIDDLEWARE = [
 
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since')
+                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since', 'if-none-match', 'x-csrftoken')
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 CORS_ORIGIN_WHITELIST = [
@@ -72,12 +78,19 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
 ]
 
+CORS_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+]
+
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
 ROOT_URLCONF = 'chat_api.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,6 +103,7 @@ TEMPLATES = [
     },
 ]
 
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:3000'
 
 WSGI_APPLICATION = 'chat_api.wsgi.application'
 
