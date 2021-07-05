@@ -1,4 +1,5 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from rest_framework.request import Request
 from django.views.decorators.http import last_modified
 #from django.views.decorators.cache import cache_page
@@ -32,5 +33,7 @@ def create_and_load_messages(request):
 			if user.is_authenticated:
 				serializer.save(author=user)
 				return JsonResponse(serializer.data, status=201)
+			else:
+				return redirect('http://127.0.0.1:8000/accounts/login/')	
 		return JsonResponse(serializer.errors, status=400)		
 					
