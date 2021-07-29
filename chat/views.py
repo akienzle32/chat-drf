@@ -9,15 +9,16 @@ from rest_framework.parsers import JSONParser
 from .models import Message
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+#from django.views.decorators.cache import cache_control 
 from .serializers import MessageSerializer
-from datetime import datetime	
 from email.utils import parsedate_to_datetime
+from datetime import datetime, timedelta
 		
 
 def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
   
+#@cache_control(max_age=300)
 def create_and_load_messages(request):
 	if request.method == 'GET':
 		messages = Message.objects.all()
@@ -27,8 +28,8 @@ def create_and_load_messages(request):
 		user = request.user
 		if user.is_authenticated:
 			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
-			date = parsedate_to_datetime(if_modified_since)
-			if latest_message(request) > date:
+			parsed_date = parsedate_to_datetime(if_modified_since)
+			if latest_message(request) > parsed_date or (datetime.now() - timedelta(seconds=2)) > user.last_login:
 				return response
 			else:
 				return HttpResponse(status=304)		
