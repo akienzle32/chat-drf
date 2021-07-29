@@ -24,7 +24,11 @@ def create_and_load_messages(request):
 		serializer = MessageSerializer(messages, many=True)
 		response = JsonResponse(serializer.data, safe=False)
 		response["Access-Control-Allow-Origin"] = "*"
-		return response		
+		user = request.user
+		if user.is_authenticated:
+			return response
+		else:
+			return HttpResponse(status=401)		
 	elif request.method == 'POST':
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
