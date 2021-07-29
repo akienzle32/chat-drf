@@ -28,7 +28,7 @@ def create_and_load_messages(request):
 		if user.is_authenticated:
 			return response
 		else:
-			return HttpResponse(status=403)		
+			return HttpResponse(status=401)		
 	elif request.method == 'POST':
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
