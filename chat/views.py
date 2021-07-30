@@ -29,8 +29,8 @@ def create_and_load_messages(request):
 		if user.is_authenticated:
 			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
 			parsed_date = parsedate_to_datetime(if_modified_since)
-			if latest_message(request) > parsed_date or (datetime.now() - timedelta(seconds=2)) > user.last_login:
-				return response
+			if latest_message(request) > parsed_date or user.last_login > (datetime.now() - timedelta(seconds=8)):
+				return response	
 			else:
 				return HttpResponse(status=304)		
 		else:
