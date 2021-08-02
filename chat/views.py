@@ -30,7 +30,7 @@ def create_and_load_messages(request):
 
 			# Only return the full resource if the database has received a message within the time indicated by the
 			# 'If-Modified-Since' header OR if the user has recently logged in. 
-			if latest_message(request) > parsed_date or user.last_login > (datetime.now() - timedelta(seconds=8)):
+			if latest_message(request) > parsed_date or user.last_login > (datetime.now() - timedelta(seconds=2)):
 				return response
 			#Otherwise, return Not Modified response. 	
 			else:
