@@ -18,10 +18,3 @@ class MessageSerializer(serializers.ModelSerializer):
 
         def create(self, validated_data):
         	return Message.objects.create(**validated_data)
-
-        #def update(self, instance, validated_data):
-        #	instance.author = validated_data.get('author', instance.user.username)
-        #	instance.timestamp = validated_data.get('timestamp', instance.timestamp)
-        #	#instance.content = validated_data.get('content', instance.content)
-        #	#instance.save()
-        #	return instance	    

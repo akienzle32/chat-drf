@@ -49,5 +49,7 @@ def create_and_load_messages(request):
 			else:
 				# Maybe just make this a standard 401 response(?)
 				return redirect('http://127.0.0.1:8000/accounts/login/')	
-		return JsonResponse(serializer.errors, status=400)		
-					
+		return JsonResponse(serializer.errors, status=400)	
+
+
+		
