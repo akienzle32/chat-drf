@@ -26,16 +26,7 @@ def create_and_load_messages(request):
 
 		# Only fulfill GET request if the user has logged in.
 		if user.is_authenticated:
-			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
-			parsed_date = parsedate_to_datetime(if_modified_since)
-
-			# Only return the full resource if the database has received a message within the time indicated by the
-			# 'If-Modified-Since' header OR if the user has recently logged in. 
-			if latest_message(request) > parsed_date or user.last_login > (datetime.now() - timedelta(seconds=2)):
-				return response
-			#Otherwise, return Not Modified response. 	
-			else:
-				return HttpResponse(status=304)		
+			return response
 		else:
 			return HttpResponse(status=401)		
 	elif request.method == 'POST':
