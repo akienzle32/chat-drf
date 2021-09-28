@@ -7,8 +7,8 @@ from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
-from .models import Chat, Message
-from .serializers import ChatSerializer, MessageSerializer, UserSerializer
+from .models import Chat, Participant, Message
+from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
 
 
 def get_chats(request):
@@ -41,6 +41,20 @@ def get_user(request):
 	else:
 		return HttpResponse(status=400)
 
+
+def get_participants(request):
+	if request.method == 'GET':
+		user = request.user
+		query = Participant.objects.all()
+		serializer = ParticipantSerializer(query, many=True)
+		response = JsonResponse(serializer.data, safe=False)
+
+		if user.is_authenticated:
+			return response
+		else:
+			return HttpResponse(status=401)
+	else:
+		return HttpResponse(status=400)
 		
 # Function to get the timestamp of the latest fulfilled POST request. This will be called by create_and_load_messages
 # in order to determine if the full resource needs to be sent. 
