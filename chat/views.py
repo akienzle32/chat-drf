@@ -45,7 +45,8 @@ def get_user(request):
 def get_participants(request):
 	if request.method == 'GET':
 		user = request.user
-		query = Participant.objects.all()
+		chatIds = Participant.objects.filter(name=user).values('chat_id')
+		query = Participant.objects.filter(chat__in=chatIds)
 		serializer = ParticipantSerializer(query, many=True)
 		response = JsonResponse(serializer.data, safe=False)
 
