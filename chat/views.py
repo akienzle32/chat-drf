@@ -13,8 +13,9 @@ from .serializers import ChatSerializer, ParticipantSerializer, MessageSerialize
 
 def get_chats(request):
 	if request.method == 'GET':
-		user = request.user;
-		query = Chat.objects.all()
+		user = request.user
+		chatIds = Participant.objects.filter(name=user).values('chat_id')
+		query = Chat.objects.filter(pk__in=chatIds)
 		serializer = ChatSerializer(query, many=True)
 		response = JsonResponse(serializer.data, safe=False)
 
