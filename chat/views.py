@@ -7,8 +7,23 @@ from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
-from .models import Message
-from .serializers import MessageSerializer, UserSerializer
+from .models import Chat, Message
+from .serializers import ChatSerializer, MessageSerializer, UserSerializer
+
+
+def get_chats(request):
+	if request.method == 'GET':
+		user = request.user;
+		query = Chat.objects.all()
+		serializer = ChatSerializer(query, many=True)
+		response = JsonResponse(serializer.data, safe=False)
+
+		if user.is_authenticated:
+			return response
+		else:
+			return HttpResponse(serializer.errors, status=401)
+	else:
+		return HttpResponse(status=400)
 
 
 def get_user(request):
@@ -22,7 +37,7 @@ def get_user(request):
 		if user.is_authenticated:
 			return response
 		else:
-			return HttpResponse(serializer.errors, status=401)
+			return HttpResponse(status=401)
 	else:
 		return HttpResponse(status=400)
 
