@@ -8,7 +8,24 @@ from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
 from .models import Message
-from .serializers import MessageSerializer
+from .serializers import MessageSerializer, UserSerializer
+
+
+def get_user(request):
+	if request.method == 'GET':
+		user = request.user
+		query = User.objects.get(username=user)
+		serializer = UserSerializer(query)
+		response = JsonResponse(serializer.data)
+		#response["Access-Control-Allow-Origin"] = "*"
+
+		if user.is_authenticated:
+			return response
+		else:
+			return HttpResponse(serializer.errors, status=401)
+	else:
+		return HttpResponse(status=400)
+
 		
 # Function to get the timestamp of the latest fulfilled POST request. This will be called by create_and_load_messages
 # in order to determine if the full resource needs to be sent. 
