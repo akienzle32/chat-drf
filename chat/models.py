@@ -13,6 +13,7 @@ class Participant(models.Model):
 class Message(models.Model):
 	author = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
 	timestamp = models.DateTimeField(auto_now_add=True)
-	content = models.TextField()		
+	content = models.TextField()
+	chat = models.ForeignKey(Chat, on_delete=models.CASCADE, default=1)
 
 # Create your models here. 

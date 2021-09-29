@@ -32,11 +32,14 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(queryset=User.objects.all(), required=False, allow_null=True, slug_field='username')
+    chat = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Message
-        fields = ('id', 'author', 'timestamp', 'content')
-        #exclude = ['author']
+        fields = ('id', 'author', 'timestamp', 'content', 'chat')
 
         def create(self, validated_data):
         	return Message.objects.create(**validated_data)
+
+
+
