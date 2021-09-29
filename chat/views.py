@@ -64,11 +64,12 @@ def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
   
 def create_and_load_messages(request, chat):
+	path = request.get_full_path()
+	pathList = path.split('/')
+	chatId = pathList[3]
+	#messages = Message.objects.filter(chat=chat)
 	if request.method == 'GET':
-		path = request.get_full_path()
-		pathList = path.split('/')
-		chat = pathList[3]
-		messages = Message.objects.filter(chat=chat)
+		messages = Message.objects.filter(chat=chatId)
 		recent_messages = messages.order_by('-id')[:20]
 		recent_messages_sorted = reversed(recent_messages)
 		serializer = MessageSerializer(recent_messages_sorted, many=True)
@@ -82,13 +83,17 @@ def create_and_load_messages(request, chat):
 		else:
 			return HttpResponse(status=401)		
 	elif request.method == 'POST':
+		#path = request.get_full_path()
+		#pathList = path.split('/')
+		#chatId = pathList[3]
+		chat = Chat.objects.get(pk=chatId)
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
 		if serializer.is_valid():
 			user = request.user
 			#Only fulfill POST request if the user has logged in. If they have not, redirect them to the login page. 
 			if user.is_authenticated:
-				serializer.save(author=user)
+				serializer.save(author=user, chat=chat)
 				return JsonResponse(serializer.data, status=201)
 			else:
 				# Maybe just make this a standard 401 response(?)
