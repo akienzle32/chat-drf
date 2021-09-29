@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -63,13 +63,17 @@ def get_participants(request):
 def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
   
-def create_and_load_messages(request):
+def create_and_load_messages(request, chat):
 	if request.method == 'GET':
-		recent_messages = Message.objects.all().order_by('-id')[:20]
+		path = request.get_full_path()
+		pathList = path.split('/')
+		chat = pathList[3]
+		messages = Message.objects.filter(chat=chat)
+		recent_messages = messages.order_by('-id')[:20]
 		recent_messages_sorted = reversed(recent_messages)
 		serializer = MessageSerializer(recent_messages_sorted, many=True)
 		response = JsonResponse(serializer.data, safe=False)
-		response["Access-Control-Allow-Origin"] = "*"
+		#response["Access-Control-Allow-Origin"] = "*"
 		user = request.user
 
 		# Only fulfill GET request if the user has logged in.
