@@ -25,15 +25,14 @@ def get_users(request):
 
 def get_current_user(request):
 	user = request.user
-	query = User.objects.get(username=user)
-	serializer = UserSerializer(query)
-	response = JsonResponse(serializer.data)
-		#response["Access-Control-Allow-Origin"] = "*"
-
-	if user.is_authenticated:
-		return response
+	if user.is_anonymous:
+		return redirect('http://127.0.0.1:8000/accounts/login/')
 	else:
-		return HttpResponse(status=401)
+		query = User.objects.get(username=user)
+		serializer = UserSerializer(query)
+		response = JsonResponse(serializer.data)
+		#response["Access-Control-Allow-Origin"] = "*"
+		return response
 
 def get_and_post_chats(request):
 	if request.method == 'GET':
