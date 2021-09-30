@@ -11,7 +11,7 @@ from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
 
 
-def get_chats(request):
+def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
 		chatIds = Participant.objects.filter(name=user).values('chat_id')
@@ -23,6 +23,18 @@ def get_chats(request):
 			return response
 		else:
 			return HttpResponse(serializer.errors, status=401)
+	elif request.method == 'POST':
+		data = JSONParser().parse(request)
+		serializer = ChatSerializer(data=data)
+		if serializer.is_valid():
+			user = request.user
+			if user.is_authenticated:
+				serializer.save()
+				return JsonResponse(serializer.data, status=201)
+			else:
+				return HttpResponse(status=401)
+		else:
+			return HttpResponse(serializer.errors, status=400)
 	else:
 		return HttpResponse(status=400)
 
@@ -43,7 +55,7 @@ def get_user(request):
 		return HttpResponse(status=400)
 
 
-def get_participants(request):
+def get_and_post_participants(request):
 	if request.method == 'GET':
 		user = request.user
 		chatIds = Participant.objects.filter(name=user).values('chat_id')
@@ -55,6 +67,20 @@ def get_participants(request):
 			return response
 		else:
 			return HttpResponse(status=401)
+	elif request.method == 'POST':
+		data = JSONParser().parse(request)
+		chatId = data['chat']
+		chat = Chat.objects.get(pk=chatId)
+		serializer = ParticipantSerializer(data=data)
+		if serializer.is_valid():
+			user = request.user
+			if user.is_authenticated:
+				serializer.save(chat=chat)
+				return JsonResponse(serializer.data, status=201)
+			else:
+				return HttpResponse(status=401)
+		else:
+			return HttpResponse(serializer.errors, status=400)		
 	else:
 		return HttpResponse(status=400)
 		
@@ -67,7 +93,6 @@ def create_and_load_messages(request, chat):
 	path = request.get_full_path()
 	pathList = path.split('/')
 	chatId = pathList[3]
-	#messages = Message.objects.filter(chat=chat)
 	if request.method == 'GET':
 		messages = Message.objects.filter(chat=chatId)
 		recent_messages = messages.order_by('-id')[:20]
@@ -83,9 +108,6 @@ def create_and_load_messages(request, chat):
 		else:
 			return HttpResponse(status=401)		
 	elif request.method == 'POST':
-		#path = request.get_full_path()
-		#pathList = path.split('/')
-		#chatId = pathList[3]
 		chat = Chat.objects.get(pk=chatId)
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
