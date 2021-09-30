@@ -39,6 +39,18 @@ def get_and_post_chats(request):
 		return HttpResponse(status=400)
 
 
+def get_users(request):
+	query = User.objects.all()
+	serializer = UserSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if user.is_superuser:
+		return response
+	else:
+		return HttpResponse(status=401)
+
+
+
 def get_current_user(request):
 	if request.method == 'GET':
 		user = request.user
