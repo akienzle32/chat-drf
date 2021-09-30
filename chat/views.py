@@ -11,6 +11,30 @@ from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
 
 
+def get_users(request):
+	query = User.objects.all()
+	serializer = UserSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if user.is_superuser:
+		return response
+	else:
+		return HttpResponse(status=401)
+
+
+
+def get_current_user(request):
+	user = request.user
+	query = User.objects.get(username=user)
+	serializer = UserSerializer(query)
+	response = JsonResponse(serializer.data)
+		#response["Access-Control-Allow-Origin"] = "*"
+
+	if user.is_authenticated:
+		return response
+	else:
+		return HttpResponse(status=401)
+
 def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
@@ -35,34 +59,6 @@ def get_and_post_chats(request):
 				return HttpResponse(status=401)
 		else:
 			return HttpResponse(serializer.errors, status=400)
-	else:
-		return HttpResponse(status=400)
-
-
-def get_users(request):
-	query = User.objects.all()
-	serializer = UserSerializer(query, many=True)
-	response = JsonResponse(serializer.data, safe=False)
-	user = request.user
-	if user.is_superuser:
-		return response
-	else:
-		return HttpResponse(status=401)
-
-
-
-def get_current_user(request):
-	if request.method == 'GET':
-		user = request.user
-		query = User.objects.get(username=user)
-		serializer = UserSerializer(query)
-		response = JsonResponse(serializer.data)
-		#response["Access-Control-Allow-Origin"] = "*"
-
-		if user.is_authenticated:
-			return response
-		else:
-			return HttpResponse(status=401)
 	else:
 		return HttpResponse(status=400)
 
