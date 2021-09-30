@@ -108,9 +108,12 @@ def create_and_load_messages(request, chat):
 		response = JsonResponse(serializer.data, safe=False)
 		#response["Access-Control-Allow-Origin"] = "*"
 		user = request.user
+		participant_list = []
+		for participant in Participant.objects.filter(chat=chatId):
+			participant_list.append(participant.name)
 
 		# Only fulfill GET request if the user has logged in.
-		if user.is_authenticated:
+		if user.is_authenticated and user in participant_list:
 			return response
 		else:
 			return HttpResponse(status=401)		
