@@ -39,7 +39,7 @@ def get_and_post_chats(request):
 		return HttpResponse(status=400)
 
 
-def get_user(request):
+def get_current_user(request):
 	if request.method == 'GET':
 		user = request.user
 		query = User.objects.get(username=user)
