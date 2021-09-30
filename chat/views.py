@@ -111,10 +111,20 @@ def create_and_load_messages(request, chat):
 		participant_list = []
 		for participant in Participant.objects.filter(chat=chatId):
 			participant_list.append(participant.name)
-
-		# Only fulfill GET request if the user has logged in.
 		if user.is_authenticated and user in participant_list:
-			return response
+			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
+
+			if if_modified_since is None:
+				return response
+			else:
+				parsed_date = parsedate_to_datetime(if_modified_since)
+			# Only return the full resource if the database has received a message within the time indicated by the
+			# 'If-Modified-Since' header
+				if latest_message(request) > parsed_date:
+					return response
+			#Otherwise, return Not Modified response. 	
+				else:
+					return HttpResponse(status=304)
 		else:
 			return HttpResponse(status=401)		
 	elif request.method == 'POST':
@@ -131,6 +141,8 @@ def create_and_load_messages(request, chat):
 				# Maybe just make this a standard 401 response(?)
 				return redirect('http://127.0.0.1:8000/accounts/login/')	
 		return JsonResponse(serializer.errors, status=400)	
+
+		# Only fulfill GET request if the user has logged in.
 
 
 		
