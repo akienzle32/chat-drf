@@ -16,10 +16,10 @@ def get_users(request):
 	serializer = UserSerializer(query, many=True)
 	response = JsonResponse(serializer.data, safe=False)
 	user = request.user
-	if user.is_superuser:
-		return response
-	else:
+	if not user.is_superuser:
 		return HttpResponse(status=401)
+	else:
+		return response
 
 
 
