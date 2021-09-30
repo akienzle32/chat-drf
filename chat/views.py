@@ -21,8 +21,6 @@ def get_users(request):
 	else:
 		return response
 
-
-
 def get_current_user(request):
 	user = request.user
 	if user.is_anonymous:
@@ -61,8 +59,8 @@ def get_and_post_chats(request):
 	else:
 		return HttpResponse(status=400)
 
-
 def get_and_post_participants(request):
+	# Returns a list of the participants in all of a given user's chats.
 	if request.method == 'GET':
 		user = request.user
 		chatIds = Participant.objects.filter(name=user).values('chat_id')
@@ -95,6 +93,7 @@ def get_and_post_participants(request):
 # in order to determine if the full resource needs to be sent. 
 def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
+
   
 def create_and_load_messages(request, chat):
 	path = request.get_full_path()
@@ -109,20 +108,25 @@ def create_and_load_messages(request, chat):
 		#response["Access-Control-Allow-Origin"] = "*"
 		user = request.user
 		participant_list = []
+
 		for participant in Participant.objects.filter(chat=chatId):
 			participant_list.append(participant.name)
+
 		if user.is_authenticated and user in participant_list:
 			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
 
+			# This conditional accounts for the fact that the first GET request from the client will not include
+			# an If-Modified-Since header, so that they can see the full resource on initial page load.
 			if if_modified_since is None:
 				return response
 			else:
 				parsed_date = parsedate_to_datetime(if_modified_since)
+
 			# Only return the full resource if the database has received a message within the time indicated by the
-			# 'If-Modified-Since' header
+			# 'If-Modified-Since' header.
 				if latest_message(request) > parsed_date:
 					return response
-			#Otherwise, return Not Modified response. 	
+			# Otherwise, return Not Modified response. 	
 				else:
 					return HttpResponse(status=304)
 		else:
@@ -133,7 +137,7 @@ def create_and_load_messages(request, chat):
 		serializer = MessageSerializer(data=data)
 		if serializer.is_valid():
 			user = request.user
-			#Only fulfill POST request if the user has logged in. If they have not, redirect them to the login page. 
+			# Only fulfill POST request if the user has logged in. If they have not, redirect them to the login page. 
 			if user.is_authenticated:
 				serializer.save(author=user, chat=chat)
 				return JsonResponse(serializer.data, status=201)
@@ -141,8 +145,6 @@ def create_and_load_messages(request, chat):
 				# Maybe just make this a standard 401 response(?)
 				return redirect('http://127.0.0.1:8000/accounts/login/')	
 		return JsonResponse(serializer.errors, status=400)	
-
-		# Only fulfill GET request if the user has logged in.
 
 
 		
