@@ -7,5 +7,6 @@ urlpatterns = [
 	path('current-user', views.get_current_user, name='get_current_user'),
 	path('users', views.get_users, name='get_users'),
 	path('participants', views.get_and_post_participants, name='get_and_post_participants'),
-	path('', views.get_and_post_chats, name='get_and_post_chats'),
+	path('chats', views.get_and_post_chats, name='get_and_post_chats'),
+	path('', views.get_all_chats, name='get_all_chats')
 ]

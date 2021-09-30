@@ -32,6 +32,16 @@ def get_current_user(request):
 		#response["Access-Control-Allow-Origin"] = "*"
 		return response
 
+def get_all_chats(request):
+	query = Chat.objects.all()
+	serializer = ChatSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if not user.is_superuser:
+		return HttpResponse(status=401)
+	else:
+		return response
+
 def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
