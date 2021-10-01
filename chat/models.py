@@ -6,7 +6,7 @@ DEFAULT_CHAT_PK = 1;
 
 class Chat(models.Model):
 	name = models.CharField(max_length=50)
-
+	last_modified = models.ForeignKey('Message', blank=True, null=True, related_name='times', on_delete=models.CASCADE)
 
 class Participant(models.Model):
 	name = models.ForeignKey(User, on_delete=models.CASCADE)

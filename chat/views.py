@@ -69,6 +69,28 @@ def get_and_post_chats(request):
 	else:
 		return HttpResponse(status=400)
 
+def get_and_patch_chat(request, chat):
+	user = request.user
+	if request.method == 'GET':
+		query = Chat.objects.get(pk=chat)
+		serializer = ChatSerializer(query)
+		response = JsonResponse(serializer.data)
+		if user.is_authenticated:
+			return response
+	elif request.method == 'PUT':
+		current_chat = Chat.objects.get(pk=chat)
+		latest_message = Message.objects.filter(chat=current_chat).latest('timestamp')
+		current_chat.last_modified = latest_message
+		if user.is_authenticated:
+			current_chat.save()
+			return HttpResponse(status=201)
+		else:
+			return HttpResponse(status=401)
+	else:
+		return HttpResponse(status=400)
+
+
+
 def get_and_post_participants(request):
 	# Returns a list of the participants in all of a given user's chats.
 	if request.method == 'GET':
