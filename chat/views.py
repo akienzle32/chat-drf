@@ -83,7 +83,8 @@ def get_and_patch_chat(request, chat):
 		current_chat.last_modified = latest_message
 		if user.is_authenticated:
 			current_chat.save()
-			return HttpResponse(status=201)
+			serializer = ChatSerializer(current_chat)
+			return JsonResponse(serializer.data, status=201)
 		else:
 			return HttpResponse(status=401)
 	else:
