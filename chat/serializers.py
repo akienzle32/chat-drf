@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=50)
-    last_modified = serializers.SlugRelatedField(queryset=Message.objects.all(), slug_field='timestamp')
+    last_modified = serializers.SlugRelatedField(queryset=Message.objects.all(), required=False, allow_null=True, slug_field='timestamp')
     class Meta:
         model = Chat
         fields = ['id', 'name', 'last_modified']
