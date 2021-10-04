@@ -117,7 +117,7 @@ def get_and_post_participants(request):
 		new_participant = safe_get(username);
 
 		if not new_participant:
-			return HttpResponse('Username does not exist', status=400)
+			return HttpResponse('Username does not exist', status=404)
 		else:
 			participant_query = Participant.objects.filter(chat=chat)
 			participant_list = []
