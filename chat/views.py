@@ -57,15 +57,15 @@ def get_and_post_chats(request):
 	elif request.method == 'POST':
 		data = JSONParser().parse(request)
 		serializer = ChatSerializer(data=data)
-		if serializer.is_valid():
+		if not serializer.is_valid():
+			return HttpResponse(serializer.errors, status=400)
+		else:
 			user = request.user
-			if user.is_authenticated:
+			if not user.is_authenticated:
+				return HttpResponse(status=401)
+			else:
 				serializer.save()
 				return JsonResponse(serializer.data, status=201)
-			else:
-				return HttpResponse(status=401)
-		else:
-			return HttpResponse(serializer.errors, status=400)
 	else:
 		return HttpResponse(status=400)
 
