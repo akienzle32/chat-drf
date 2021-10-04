@@ -90,7 +90,11 @@ def get_and_patch_chat(request, chat):
 	else:
 		return HttpResponse(status=400)
 
-
+def safe_get(username):
+	try:
+		return User.objects.get(username=username);
+	except User.DoesNotExist:
+		return None;
 
 def get_and_post_participants(request):
 	# Returns a list of the participants in all of a given user's chats.
@@ -109,16 +113,30 @@ def get_and_post_participants(request):
 		data = JSONParser().parse(request)
 		chatId = data['chat']
 		chat = Chat.objects.get(pk=chatId)
-		serializer = ParticipantSerializer(data=data)
-		if serializer.is_valid():
-			user = request.user
-			if user.is_authenticated:
-				serializer.save(chat=chat)
-				return JsonResponse(serializer.data, status=201)
-			else:
-				return HttpResponse(status=401)
+		username = data['name']
+		new_participant = safe_get(username);
+
+		if not new_participant:
+			return HttpResponse('Username does not exist', status=400)
 		else:
-			return HttpResponse(serializer.errors, status=400)		
+			participant_query = Participant.objects.filter(chat=chat)
+			participant_list = []
+			for participant in participant_query:
+				participant_list.append(participant.name)
+
+			if new_participant in participant_list:
+				return HttpResponse('Participant already in chat', status=400)
+			else:
+				serializer = ParticipantSerializer(data=data)
+				if not serializer.is_valid():
+					return HttpResponse(serializer.errors, status=400)	
+				else:
+					user = request.user
+					if not user.is_authenticated:
+						return HttpResponse(status=401)	
+					else:
+						serializer.save(chat=chat)
+						return JsonResponse(serializer.data, status=201)
 	else:
 		return HttpResponse(status=400)
 		
