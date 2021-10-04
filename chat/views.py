@@ -163,7 +163,9 @@ def create_and_load_messages(request, chat):
 		for participant in Participant.objects.filter(chat=chatId):
 			participant_list.append(participant.name)
 
-		if user.is_authenticated and user in participant_list:
+		if not user.is_authenticated or user not in participant_list:
+			return HttpResponse(status=401)	
+		else:
 			if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
 
 			# This conditional accounts for the fact that the first GET request from the client will not include
@@ -173,29 +175,29 @@ def create_and_load_messages(request, chat):
 			else:
 				parsed_date = parsedate_to_datetime(if_modified_since)
 
-			# Only return the full resource if the database has received a message within the time indicated by the
-			# 'If-Modified-Since' header.
+				# Only return the full resource if the database has received a message within the time indicated by the
+				# 'If-Modified-Since' header.
 				if latest_message(request) > parsed_date:
 					return response
-			# Otherwise, return Not Modified response. 	
+				# Otherwise, return Not Modified response. 	
 				else:
-					return HttpResponse(status=304)
-		else:
-			return HttpResponse(status=401)		
+					return HttpResponse(status=304)	
 	elif request.method == 'POST':
 		chat = Chat.objects.get(pk=chatId)
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
-		if serializer.is_valid():
+		if not serializer.is_valid():
+			return JsonResponse(serializer.errors, status=400)
+		else:
 			user = request.user
 			# Only fulfill POST request if the user has logged in. If they have not, redirect them to the login page. 
-			if user.is_authenticated:
+			if not user.is_authenticated:
+				return redirect('http://127.0.0.1:8000/accounts/login/')	
+			else:
 				serializer.save(author=user, chat=chat)
 				return JsonResponse(serializer.data, status=201)
-			else:
-				# Maybe just make this a standard 401 response(?)
-				return redirect('http://127.0.0.1:8000/accounts/login/')	
-		return JsonResponse(serializer.errors, status=400)	
+	else:
+		return HttpResponse(status=400)
 
 
 		
