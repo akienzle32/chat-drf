@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
@@ -9,6 +9,26 @@ from datetime import datetime, timedelta
 
 from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
+
+
+def login_user(request):
+	if request.method != 'POST':
+		return HttpResponse('Hello', status=200)
+	else:
+		username = request.POST.get('username')
+		print(username)
+		password = request.POST.get('password')
+		user = authenticate(request, username=username, password=password)
+		if user is not None:
+			login(request, user)
+			serializer = UserSerializer(user);
+			return JsonResponse(serializer.data, status=200)
+		else:
+			return HttpResponse(status=404)
+
+def logout_user(request):
+	logout(request)
+	return HttpResponse(status=200)
 
 
 def get_users(request):
