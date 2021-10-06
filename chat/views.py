@@ -134,9 +134,9 @@ def get_and_post_participants(request):
 		chatId = data['chat']
 		chat = Chat.objects.get(pk=chatId)
 		username = data['name']
-		new_participant = safe_get(username);
+		new_participant = safe_get(username)
 
-		if not new_participant:
+		if new_participant is None:
 			return HttpResponse('Username does not exist', status=404)
 		else:
 			participant_query = Participant.objects.filter(chat=chat)
