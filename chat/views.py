@@ -13,10 +13,9 @@ from .serializers import ChatSerializer, ParticipantSerializer, MessageSerialize
 
 def login_user(request):
 	if request.method != 'POST':
-		return HttpResponse('Hello', status=200)
+		return HttpResponse(status=200)
 	else:
 		username = request.POST.get('username')
-		print(username)
 		password = request.POST.get('password')
 		user = authenticate(request, username=username, password=password)
 		if user is not None:
