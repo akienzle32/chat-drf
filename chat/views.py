@@ -89,7 +89,7 @@ def get_and_post_chats(request):
 	else:
 		return HttpResponse(status=400)
 
-def get_and_patch_chat(request, chat):
+def get_patch_and_delete_chat(request, chat):
 	user = request.user
 	if request.method == 'GET':
 		query = Chat.objects.get(pk=chat)
@@ -107,6 +107,11 @@ def get_and_patch_chat(request, chat):
 			current_chat.save()
 			serializer = ChatSerializer(current_chat)
 			return JsonResponse(serializer.data, status=201)
+	elif request.method == 'DELETE':
+		current_chat = Chat.objects.get(pk=chat)
+		current_chat.delete()
+		response_msg = 'Chat successfully deleted'
+		return HttpResponse(response_msg, status=200)
 	else:
 		return HttpResponse(status=400)
 
