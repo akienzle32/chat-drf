@@ -44,7 +44,7 @@ def get_users(request):
 def get_current_user(request):
 	user = request.user
 	if user.is_anonymous:
-		return redirect('http://127.0.0.1:8000/accounts/login/')
+		return HttpResponse(status=404)
 	else:
 		query = User.objects.get(username=user)
 		serializer = UserSerializer(query)
