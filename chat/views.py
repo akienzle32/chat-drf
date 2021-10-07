@@ -13,10 +13,9 @@ from .serializers import ChatSerializer, ParticipantSerializer, MessageSerialize
 
 def login_user(request):
 	if request.method != 'POST':
-		return HttpResponse('Hello', status=200)
+		return HttpResponse(status=200)
 	else:
 		username = request.POST.get('username')
-		print(username)
 		password = request.POST.get('password')
 		user = authenticate(request, username=username, password=password)
 		if user is not None:
@@ -44,7 +43,7 @@ def get_users(request):
 def get_current_user(request):
 	user = request.user
 	if user.is_anonymous:
-		return redirect('http://127.0.0.1:8000/accounts/login/')
+		return HttpResponse(status=404)
 	else:
 		query = User.objects.get(username=user)
 		serializer = UserSerializer(query)
