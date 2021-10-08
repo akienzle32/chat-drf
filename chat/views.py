@@ -41,9 +41,11 @@ def simple_register_new_user(request):
 	new_user = safe_get(username)
 
 	if first_password != second_password:
-		return HttpResponse(status=400)
+		msg = 'Passwords do not match'
+		return HttpResponse(msg, status=400)
 	elif new_user != None:
-		return HttpResponse(status=400)
+		msg = 'That username is not available'
+		return HttpResponse(msg, status=400)
 	else:
 		new_user = User.objects.create_user(username, email, first_password)
 		serializer = UserSerializer(new_user)
