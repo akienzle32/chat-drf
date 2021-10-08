@@ -1,5 +1,4 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from rest_framework.request import Request
@@ -203,20 +202,16 @@ def latest_message(request):
 
   
 def create_and_load_messages(request, chat):
-	path = request.get_full_path()
-	pathList = path.split('/')
-	chatId = pathList[3]
 	if request.method == 'GET':
-		messages = Message.objects.filter(chat=chatId)
+		messages = Message.objects.filter(chat=chat)
 		recent_messages = messages.order_by('-id')[:20]
 		recent_messages_sorted = reversed(recent_messages)
 		serializer = MessageSerializer(recent_messages_sorted, many=True)
 		response = JsonResponse(serializer.data, safe=False)
-		#response["Access-Control-Allow-Origin"] = "*"
 		user = request.user
 		participant_list = []
 
-		for participant in Participant.objects.filter(chat=chatId):
+		for participant in Participant.objects.filter(chat=chat):
 			participant_list.append(participant.name)
 
 		if not user.is_authenticated or user not in participant_list:
@@ -239,7 +234,7 @@ def create_and_load_messages(request, chat):
 				else:
 					return HttpResponse(status=304)	
 	elif request.method == 'POST':
-		chat = Chat.objects.get(pk=chatId)
+		chat = Chat.objects.get(pk=chat)
 		data = JSONParser().parse(request)
 		serializer = MessageSerializer(data=data)
 		if not serializer.is_valid():
@@ -248,7 +243,7 @@ def create_and_load_messages(request, chat):
 			user = request.user
 			# Only fulfill POST request if the user has logged in. If they have not, redirect them to the login page. 
 			if not user.is_authenticated:
-				return redirect('http://127.0.0.1:8000/accounts/login/')	
+				return HttpResponse(status=401)	
 			else:
 				serializer.save(author=user, chat=chat)
 				return JsonResponse(serializer.data, status=201)
