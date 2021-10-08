@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User, UserManager
+from django.contrib.auth.models import User
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
