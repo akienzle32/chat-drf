@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
@@ -11,23 +11,43 @@ from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
 
 
+def safe_get(username):
+	try:
+		return User.objects.get(username=username)
+	except User.DoesNotExist:
+		return None
+
 def login_user(request):
-	if request.method != 'POST':
-		return HttpResponse(status=200)
+	username = request.POST.get('username')
+	password = request.POST.get('password')
+	user = authenticate(request, username=username, password=password)
+	if user is not None:
+		login(request, user)
+		serializer = UserSerializer(user);
+		return JsonResponse(serializer.data, status=200)
 	else:
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		user = authenticate(request, username=username, password=password)
-		if user is not None:
-			login(request, user)
-			serializer = UserSerializer(user);
-			return JsonResponse(serializer.data, status=200)
-		else:
-			return HttpResponse(status=404)
+		return HttpResponse(status=404)
 
 def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
+
+
+def simple_register_new_user(request):
+	username = request.POST.get('username')
+	email = request.POST.get('email')
+	first_password = request.POST.get('password1')
+	second_password = request.POST.get('password2')
+	new_user = safe_get(username)
+
+	if first_password != second_password:
+		return HttpResponse(status=400)
+	elif new_user != None:
+		return HttpResponse(status=400)
+	else:
+		new_user = User.objects.create_user(username, email, first_password)
+		serializer = UserSerializer(new_user)
+		return JsonResponse(serializer.data, status=200)
 
 
 def get_users(request):
@@ -113,12 +133,6 @@ def get_patch_and_delete_chat(request, chat):
 		return HttpResponse(response_msg, status=200)
 	else:
 		return HttpResponse(status=400)
-
-def safe_get(username):
-	try:
-		return User.objects.get(username=username);
-	except User.DoesNotExist:
-		return None;
 
 def get_and_post_participants(request):
 	# Returns a list of the participants in all of a given user's chats.
