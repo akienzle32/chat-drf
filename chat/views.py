@@ -179,6 +179,25 @@ def get_and_post_participants(request):
 						return JsonResponse(serializer.data, status=201)
 	else:
 		return HttpResponse(status=400)
+
+# This view enables a user to remove themself from any given chat in which they are a participant.
+def delete_participant(request, chat):
+	if request.method == 'GET':
+		current_chat = Chat.objects.get(pk=chat)
+		query = Participant.objects.filter(chat=current_chat)
+		serializer = ParticipantSerializer(query, many=True)
+		return JsonResponse(serializer.data, status=200, safe=False)
+	elif request.method == 'DELETE':
+		user = request.user
+		if user.is_authenticated:
+			current_chat = Chat.objects.get(pk=chat)
+			participant = Participant.objects.get(name=user, chat=current_chat)
+			participant.delete()
+			msg = 'You have been removed this chat'
+			return HttpResponse(msg, status=200)
+	else:
+		return HttpResponse(status=400)
+
 		
 # Function to get the timestamp of the latest fulfilled POST request. This will be called by create_and_load_messages
 # in order to determine if the full resource needs to be sent. 
