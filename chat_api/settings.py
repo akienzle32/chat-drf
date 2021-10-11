@@ -117,8 +117,12 @@ WSGI_APPLICATION = 'chat_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'chat_app',
+        'USER': 'alec_kienzle',
+        'PASSWORD': 'FrogMan1081',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
