@@ -1,1 +1,3 @@
 chat_api/secret_settings.py
+
+db.sqlite3
