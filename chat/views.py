@@ -1,6 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
@@ -16,6 +17,7 @@ def safe_get(username):
 	except User.DoesNotExist:
 		return None
 
+@ensure_csrf_cookie
 def login_user(request):
 	username = request.POST.get('username')
 	password = request.POST.get('password')
@@ -27,6 +29,7 @@ def login_user(request):
 	else:
 		return HttpResponse(status=404)
 
+@ensure_csrf_cookie
 def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
