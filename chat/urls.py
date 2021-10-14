@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-app_name = 'chat'
 
 urlpatterns = [
 	path('messages/<int:chat>', views.create_and_load_messages, name='create_and_load_messages'),
