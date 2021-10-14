@@ -91,6 +91,8 @@ CORS_TRUSTED_ORIGINS = [
 
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
+CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
+
 ROOT_URLCONF = 'chat_api.urls'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
