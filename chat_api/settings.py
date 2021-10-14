@@ -78,13 +78,15 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:3000',
     'http://localhost:3000',
-    'http://localhost:5000'
+    'http://localhost:5000',
+    'https://alec-chat-app.herokuapp.com'
 ]
 
 CORS_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:3000',
     'http://localhost:5000'
+    'https://alec-chat-app.herokuapp.com'
 ]
 
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
