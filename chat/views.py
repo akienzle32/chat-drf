@@ -14,7 +14,7 @@ from .serializers import ChatSerializer, ParticipantSerializer, MessageSerialize
 def get_csrf_token(request):
 	csrf_token = get_token(request)
 	if csrf_token != None:
-		return JsonResponse(csrf_token, status=200)
+		return JsonResponse(csrf_token, status=200, safe=False)
 	else:
 		return HttpResponse(status=404)
 
