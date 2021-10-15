@@ -69,7 +69,7 @@ MIDDLEWARE = [
 
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since', 'if-none-match', 'x-csrftoken')
+                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since', 'if-none-match')
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -88,13 +88,12 @@ CORS_TRUSTED_ORIGINS = [
     'https://alec-chat-app.herokuapp.com'
 ]
 
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
-CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
+#CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
 
-CSRF_COOKIE_DOMAIN = 'alec-chat-app.herokuapp.com'
+#CSRF_COOKIE_DOMAIN = 'alec-chat-app.herokuapp.com'
 
-CSRF_COOKIE_SAMESITE = None
+#CSRF_COOKIE_SAMESITE = None
 
 ROOT_URLCONF = 'chat_api.urls'
 
