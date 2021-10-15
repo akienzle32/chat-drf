@@ -95,6 +95,8 @@ CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
 
 CSRF_COOKIE_DOMAIN = 'alec-chat-app.herokuapp.com'
 
+CSRF_COOKIE_SAMESITE = None
+
 ROOT_URLCONF = 'chat_api.urls'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
