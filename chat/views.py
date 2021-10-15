@@ -1,7 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import get_token, ensure_csrf_cookie
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
@@ -10,34 +9,24 @@ from datetime import datetime, timedelta
 from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
 
-
-def get_csrf_token(request):
-	csrf_token = get_token(request)
-	if csrf_token != None:
-		return JsonResponse(csrf_token, status=200, safe=False)
-	else:
-		return HttpResponse(status=404)
-
-
 def safe_get(username):
 	try:
 		return User.objects.get(username=username)
 	except User.DoesNotExist:
 		return None
 
-@ensure_csrf_cookie
-def login_user(request):
-	username = request.POST.get('username')
-	password = request.POST.get('password')
-	user = authenticate(request, username=username, password=password)
-	if user is not None:
-		login(request, user)
-		serializer = UserSerializer(user);
-		return JsonResponse(serializer.data, status=200)
-	else:
-		return HttpResponse(status=404)
 
-@ensure_csrf_cookie
+#def login_user(request):
+#	username = request.POST.get('username')
+#	password = request.POST.get('password')
+#	user = authenticate(request, username=username, password=password)
+#	if user is not None:
+#		login(request, user)
+#		serializer = UserSerializer(user);
+#		return JsonResponse(serializer.data, status=200)
+#	else:
+#		return HttpResponse(status=404)
+
 def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
