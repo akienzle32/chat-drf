@@ -14,5 +14,6 @@ urlpatterns = [
 	path('login', views.login_user, name='login_user'),
 	path('logout', views.logout_user, name='logout_user'),
 	path('register', views.simple_register_new_user, name='simple_register_new_user'),
+	path('token', views.get_csrf_token, name='get_csrf_token'),
 	path('', views.get_all_chats, name='get_all_chats')
 ]

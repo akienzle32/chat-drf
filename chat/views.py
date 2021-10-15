@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import get_token, ensure_csrf_cookie
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from email.utils import parsedate_to_datetime
@@ -9,6 +9,14 @@ from datetime import datetime, timedelta
 
 from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
+
+
+def get_csrf_token(request):
+	csrf_token = get_token(request)
+	if csrf_token != None:
+		return JsonResponse(csrf_token, status=200)
+	else:
+		return HttpResponse(status=404)
 
 
 def safe_get(username):
