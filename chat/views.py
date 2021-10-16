@@ -111,6 +111,7 @@ def get_and_post_chats(request):
 	else:
 		return HttpResponse(status=400)
 
+@api_view(['GET', 'PUT', 'DELETE'])
 def get_patch_and_delete_chat(request, chat):
 	user = request.user
 	if request.method == 'GET':
@@ -140,6 +141,7 @@ def get_patch_and_delete_chat(request, chat):
 	else:
 		return HttpResponse(status=400)
 
+@api_view(['GET', 'POST'])
 def get_and_post_participants(request):
 	# Returns a list of the participants in all of a given user's chats.
 	if request.method == 'GET':
@@ -185,6 +187,7 @@ def get_and_post_participants(request):
 		return HttpResponse(status=400)
 
 # This view enables a user to remove themself from any given chat in which they are a participant.
+@api_view(['DELETE'])
 def delete_participant(request, chat):
 	user = request.user
 	if user.is_authenticated:
@@ -202,7 +205,7 @@ def delete_participant(request, chat):
 def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
 
-  
+@api_view(['GET', 'POST'])
 def create_and_load_messages(request, chat):
 	if request.method == 'GET':
 		messages = Message.objects.filter(chat=chat)
