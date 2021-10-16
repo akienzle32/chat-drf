@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
