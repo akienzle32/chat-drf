@@ -32,6 +32,7 @@ def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
 
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def simple_register_new_user(request):
 	username = request.POST.get('username')
