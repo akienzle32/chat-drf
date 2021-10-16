@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
@@ -84,6 +85,7 @@ def get_all_chats(request):
 		return response
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
