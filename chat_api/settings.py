@@ -46,7 +46,7 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DATETIME_INPUT_FORMATS': ['%a, %b %e %-I:%M%p',],
     'DATETIME_FORMAT': '%a, %b %e %-I:%M%p',

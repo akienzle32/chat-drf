@@ -17,7 +17,6 @@ def safe_get(username):
 	except User.DoesNotExist:
 		return None
 
-
 #def login_user(request):
 #	username = request.POST.get('username')
 #	password = request.POST.get('password')
@@ -33,7 +32,7 @@ def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
 
-
+@permission_classes([AllowAny])
 def simple_register_new_user(request):
 	username = request.POST.get('username')
 	email = request.POST.get('email')
@@ -49,6 +48,7 @@ def simple_register_new_user(request):
 		return HttpResponse(msg, status=400)
 	else:
 		new_user = User.objects.create_user(username, email, first_password)
+		Token.objects.create(user=new_user)
 		serializer = UserSerializer(new_user)
 		return JsonResponse(serializer.data, status=200)
 
@@ -85,7 +85,6 @@ def get_all_chats(request):
 		return response
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
