@@ -88,18 +88,7 @@ CORS_TRUSTED_ORIGINS = [
     'https://alec-chat-app.herokuapp.com'
 ]
 
-
-#CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
-
-#CSRF_COOKIE_DOMAIN = 'alec-chat-app.herokuapp.com'
-
-#CSRF_COOKIE_SAMESITE = None
-
 ROOT_URLCONF = 'chat_api.urls'
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-SESSION_COOKIE_AGE = 3600
 
 TEMPLATES = [
     {
@@ -116,8 +105,6 @@ TEMPLATES = [
         },
     },
 ]
-
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:3000'
 
 WSGI_APPLICATION = 'chat_api.wsgi.application'
 
