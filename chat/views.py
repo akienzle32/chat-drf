@@ -18,17 +18,6 @@ def safe_get(username):
 	except User.DoesNotExist:
 		return None
 
-#def login_user(request):
-#	username = request.POST.get('username')
-#	password = request.POST.get('password')
-#	user = authenticate(request, username=username, password=password)
-#	if user is not None:
-#		login(request, user)
-#		serializer = UserSerializer(user);
-#		return JsonResponse(serializer.data, status=200)
-#	else:
-#		return HttpResponse(status=404)
-
 def logout_user(request):
 	logout(request)
 	return HttpResponse(status=200)
@@ -73,7 +62,6 @@ def get_current_user(request):
 		query = User.objects.get(username=user)
 		serializer = UserSerializer(query)
 		response = JsonResponse(serializer.data)
-		#response["Access-Control-Allow-Origin"] = "*"
 		return response
 
 def get_all_chats(request):
@@ -212,7 +200,7 @@ def latest_message(request):
 def create_and_load_messages(request, chat):
 	if request.method == 'GET':
 		messages = Message.objects.filter(chat=chat)
-		recent_messages = messages.order_by('-id')[:20]
+		recent_messages = messages.order_by('-id')[:50]
 		recent_messages_sorted = reversed(recent_messages)
 		serializer = MessageSerializer(recent_messages_sorted, many=True)
 		response = JsonResponse(serializer.data, safe=False)
