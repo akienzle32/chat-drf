@@ -18,10 +18,6 @@ def safe_get(username):
 	except User.DoesNotExist:
 		return None
 
-def logout_user(request):
-	logout(request)
-	return HttpResponse(status=200)
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def simple_register_new_user(request):
@@ -42,37 +38,6 @@ def simple_register_new_user(request):
 		Token.objects.create(user=new_user)
 		serializer = UserSerializer(new_user)
 		return JsonResponse(serializer.data, status=200)
-
-
-def get_users(request):
-	query = User.objects.all()
-	serializer = UserSerializer(query, many=True)
-	response = JsonResponse(serializer.data, safe=False)
-	user = request.user
-	if not user.is_superuser:
-		return HttpResponse(status=401)
-	else:
-		return response
-
-def get_current_user(request):
-	user = request.user
-	if user.is_anonymous:
-		return HttpResponse(status=404)
-	else:
-		query = User.objects.get(username=user)
-		serializer = UserSerializer(query)
-		response = JsonResponse(serializer.data)
-		return response
-
-def get_all_chats(request):
-	query = Chat.objects.all()
-	serializer = ChatSerializer(query, many=True)
-	response = JsonResponse(serializer.data, safe=False)
-	user = request.user
-	if not user.is_superuser:
-		return HttpResponse(status=401)
-	else:
-		return response
 
 @api_view(['GET', 'POST'])
 def get_and_post_chats(request):
@@ -245,6 +210,29 @@ def create_and_load_messages(request, chat):
 				return JsonResponse(serializer.data, status=201)
 	else:
 		return HttpResponse(status=400)
+
+#The last two views are only accessible to superusers.
+@api_view(['GET'])
+def get_users(request):
+	query = User.objects.all()
+	serializer = UserSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if not user.is_superuser:
+		return HttpResponse(status=401)
+	else:
+		return response
+
+@api_view(['GET'])
+def get_all_chats(request):
+	query = Chat.objects.all()
+	serializer = ChatSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if not user.is_superuser:
+		return HttpResponse(status=401)
+	else:
+		return response
 
 
 		
