@@ -1,14 +1,16 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
 from .models import Chat, Participant, Message
 from .serializers import ChatSerializer, ParticipantSerializer, MessageSerializer, UserSerializer
-
 
 def safe_get(username):
 	try:
@@ -16,22 +18,8 @@ def safe_get(username):
 	except User.DoesNotExist:
 		return None
 
-def login_user(request):
-	username = request.POST.get('username')
-	password = request.POST.get('password')
-	user = authenticate(request, username=username, password=password)
-	if user is not None:
-		login(request, user)
-		serializer = UserSerializer(user);
-		return JsonResponse(serializer.data, status=200)
-	else:
-		return HttpResponse(status=404)
-
-def logout_user(request):
-	logout(request)
-	return HttpResponse(status=200)
-
-
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def simple_register_new_user(request):
 	username = request.POST.get('username')
 	email = request.POST.get('email')
@@ -47,41 +35,11 @@ def simple_register_new_user(request):
 		return HttpResponse(msg, status=400)
 	else:
 		new_user = User.objects.create_user(username, email, first_password)
+		Token.objects.create(user=new_user)
 		serializer = UserSerializer(new_user)
 		return JsonResponse(serializer.data, status=200)
 
-
-def get_users(request):
-	query = User.objects.all()
-	serializer = UserSerializer(query, many=True)
-	response = JsonResponse(serializer.data, safe=False)
-	user = request.user
-	if not user.is_superuser:
-		return HttpResponse(status=401)
-	else:
-		return response
-
-def get_current_user(request):
-	user = request.user
-	if user.is_anonymous:
-		return HttpResponse(status=404)
-	else:
-		query = User.objects.get(username=user)
-		serializer = UserSerializer(query)
-		response = JsonResponse(serializer.data)
-		#response["Access-Control-Allow-Origin"] = "*"
-		return response
-
-def get_all_chats(request):
-	query = Chat.objects.all()
-	serializer = ChatSerializer(query, many=True)
-	response = JsonResponse(serializer.data, safe=False)
-	user = request.user
-	if not user.is_superuser:
-		return HttpResponse(status=401)
-	else:
-		return response
-
+@api_view(['GET', 'POST'])
 def get_and_post_chats(request):
 	if request.method == 'GET':
 		user = request.user
@@ -109,6 +67,7 @@ def get_and_post_chats(request):
 	else:
 		return HttpResponse(status=400)
 
+@api_view(['GET', 'PUT', 'DELETE'])
 def get_patch_and_delete_chat(request, chat):
 	user = request.user
 	if request.method == 'GET':
@@ -138,6 +97,7 @@ def get_patch_and_delete_chat(request, chat):
 	else:
 		return HttpResponse(status=400)
 
+@api_view(['GET', 'POST'])
 def get_and_post_participants(request):
 	# Returns a list of the participants in all of a given user's chats.
 	if request.method == 'GET':
@@ -183,6 +143,7 @@ def get_and_post_participants(request):
 		return HttpResponse(status=400)
 
 # This view enables a user to remove themself from any given chat in which they are a participant.
+@api_view(['DELETE'])
 def delete_participant(request, chat):
 	user = request.user
 	if user.is_authenticated:
@@ -200,11 +161,11 @@ def delete_participant(request, chat):
 def latest_message(request):
 	return Message.objects.latest("timestamp").timestamp
 
-  
+@api_view(['GET', 'POST'])
 def create_and_load_messages(request, chat):
 	if request.method == 'GET':
 		messages = Message.objects.filter(chat=chat)
-		recent_messages = messages.order_by('-id')[:20]
+		recent_messages = messages.order_by('-id')[:50]
 		recent_messages_sorted = reversed(recent_messages)
 		serializer = MessageSerializer(recent_messages_sorted, many=True)
 		response = JsonResponse(serializer.data, safe=False)
@@ -249,6 +210,29 @@ def create_and_load_messages(request, chat):
 				return JsonResponse(serializer.data, status=201)
 	else:
 		return HttpResponse(status=400)
+
+#The last two views are only accessible to superusers.
+@api_view(['GET'])
+def get_users(request):
+	query = User.objects.all()
+	serializer = UserSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if not user.is_superuser:
+		return HttpResponse(status=401)
+	else:
+		return response
+
+@api_view(['GET'])
+def get_all_chats(request):
+	query = Chat.objects.all()
+	serializer = ChatSerializer(query, many=True)
+	response = JsonResponse(serializer.data, safe=False)
+	user = request.user
+	if not user.is_superuser:
+		return HttpResponse(status=401)
+	else:
+		return response
 
 
 		

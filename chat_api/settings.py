@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
+import dj_database_url
 from pathlib import Path
-from .secret_settings import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = DJANGO_KEY
+SECRET_KEY = os.getenv('DJANGO_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['alec-chat-api.herokuapp.com']
 
 
 # Application definition
@@ -39,19 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'chat'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DATETIME_INPUT_FORMATS': ['%a, %b %e %-I:%M%p',],
     'DATETIME_FORMAT': '%a, %b %e %-I:%M%p',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
@@ -59,9 +59,9 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # new
     'django.middleware.common.CommonMiddleware', # new
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -69,7 +69,7 @@ MIDDLEWARE = [
 
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since', 'if-none-match', 'x-csrftoken')
+                      'content-type', 'accept', 'origin', 'authorization', 'if-modified-since', 'if-none-match')
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -77,14 +77,23 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:3000',
     'http://localhost:3000',
+    'http://localhost:5000',
+    'https://alec-chat-app.herokuapp.com'
 ]
 
 CORS_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:3000',
+    'http://localhost:5000'
+    'https://alec-chat-app.herokuapp.com'
 ]
 
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+#CSRF_TRUSTED_ORIGINS = ['alec-chat-app.herokuapp.com']
+
+#CSRF_COOKIE_DOMAIN = 'alec-chat-app.herokuapp.com'
+
+#CSRF_COOKIE_SAMESITE = None
 
 ROOT_URLCONF = 'chat_api.urls'
 
@@ -120,12 +129,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'chat_app',
-        'USER': DATABASE_USER,
-        'PASSWORD': DATABASE_PASSWORD,
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
@@ -165,7 +177,12 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
